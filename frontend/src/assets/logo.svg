@@ -1,0 +1,15 @@
+<svg width="300" height="100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="white" />
+
+  <!-- Circle element before the text for design -->
+  <circle cx="30" cy="50" r="20" fill="#4A90E2" />
+
+  <!-- Text "I.T.MED" -->
+  <text x="60" y="60" font-family="Verdana, Geneva, sans-serif" font-size="40" fill="#333" font-weight="bold">
+    I.T.<tspan fill="#4A90E2">MED</tspan>
+  </text>
+
+  <!-- Horizontal line for additional styling -->
+  <line x1="10" y1="90" x2="290" y2="90" stroke="#4A90E2" stroke-width="4"/>
+</svg>
