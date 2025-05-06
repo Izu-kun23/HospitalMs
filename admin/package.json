@@ -13,6 +13,7 @@
     "aws-sdk": "^2.1691.0",
     "axios": "^1.7.7",
     "buffer": "^6.0.3",
+    "caniuse-lite": "^1.0.30001717",
     "jwt-decode": "^4.0.0",
     "mock-aws-s3": "^4.0.2",
     "moment": "^2.30.1",
