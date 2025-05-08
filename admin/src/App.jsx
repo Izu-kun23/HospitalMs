@@ -21,6 +21,7 @@ import AddPharmacist from "./pages/Admin/AddPharmacist";
 import PharmacistList from "./pages/Admin/PharmacistList";
 import PharmacistDashboard from "./pages/Pharmacist/PharmacistDashboard"; 
 import PharmacistProfile from "./pages/Pharmacist/PharmacistProfile";
+import PharmacistAppointments from "./pages/Pharmacist/PharmacistAppointments";
 const App = () => {
   const { aToken } = useContext(AdminContext);
   const { dToken } = useContext(DoctorContext);
@@ -80,6 +81,7 @@ const App = () => {
             {pToken && (
               <>
                 <Route path="/pharmacist-dashboard" element={<PharmacistDashboard />} />
+                <Route path="/pharmacist-appointment" element={<PharmacistAppointments />} />
                 <Route path="/pharmacist-profile" element={<PharmacistProfile />} />
 
                 {/* Add other pharmacist routes as needed */}

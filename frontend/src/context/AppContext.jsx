@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+
 import axios from "axios";
 
 export const AppContext = createContext();
@@ -29,32 +30,15 @@ const AppContextProvider = (props) => {
 
     const getPharmacistsData = async () => {
         try {
-            console.log("Backend URL:", backendUrl);
-            console.log("Fetching pharmacists from:", `${backendUrl}/api/pharmacists/pharm-list`);
-            
-            const response = await axios.get(`${backendUrl}/api/pharmacists/pharm-list`);
-            console.log("Response Data:", response.data);
-    
-            if (response.data.success) {
-                console.log("Pharmacists fetched successfully:", response.data.pharmacists);
-                setPharmacists(response.data.pharmacists);
+            const { data } = await axios.get(`${backendUrl}/api/pharmacists/pharm-list`);
+            if (data.success) {
+                setPharmacists(data.pharmacists);
             } else {
-                console.error("Error: Backend returned a failure:", response.data.message);
-                toast.error(response.data.message || "Failed to fetch pharmacists.");
+                toast.error(data.message || "Failed to fetch pharmacists.");
             }
         } catch (error) {
-            console.error("Error fetching pharmacists:", error);
-    
-            if (error.response) {
-                console.error("Server Error Response:", error.response);
-                toast.error(error.response.data.message || "Error fetching pharmacists from the server.");
-            } else if (error.request) {
-                console.error("No response received:", error.request);
-                toast.error("No response received from the server.");
-            } else {
-                console.error("Unexpected error:", error.message);
-                toast.error("An unexpected error occurred.");
-            }
+            console.error(error);
+            toast.error("Error fetching pharmacists.");
         }
     };
 
@@ -71,6 +55,25 @@ const AppContextProvider = (props) => {
         } catch (error) {
             console.error(error);
             toast.error("Error loading user profile.");
+        }
+    };
+
+    const getPharmacistSlots = async (pharmacistId, date) => {
+        try {
+            const { data } = await axios.get(`${backendUrl}/api/pharmacists/${pharmacistId}/slots`, {
+                params: { date },
+            });
+    
+            if (data.success) {
+                return data.slots;
+            } else {
+                toast.error(data.message || "Failed to fetch slots.");
+                return [];
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Error fetching slots.");
+            return [];
         }
     };
 
@@ -99,6 +102,7 @@ const AppContextProvider = (props) => {
                 userData,
                 setUserData,
                 loadUserProfileData,
+                getPharmacistSlots,
             }}
         >
             {props.children}

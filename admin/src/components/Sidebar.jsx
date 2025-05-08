@@ -23,6 +23,8 @@ const Sidebar = () => {
       } else if (dToken) {
         response = await axios.get('/api/doctor/new-appointments', { headers: { token: dToken } });
       }
+      // else if (pToken) {
+      //   response = await axios.get('/api/pharmacist/new-appointments', { headers: { token: pToken } });
 
       if (response?.data?.newAppointmentsCount !== undefined) {
         setNewAppointments(response.data.newAppointmentsCount);
@@ -69,6 +71,14 @@ const Sidebar = () => {
             <img className='min-w-5' src={assets.add_icon} alt='' />
             <p className='hidden md:block'>Payments</p>
           </NavLink>
+          <NavLink to={'/doctor-list'} className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''}`}>
+          <img className='min-w-5' src={assets.people_icon} alt='' />
+          <p className='hidden md:block'>Doctors List</p>
+        </NavLink>
+        <NavLink to={'/pharmacist-list'} className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''}`}>
+          <img className='min-w-5' src={assets.people_icon} alt='' />
+          <p className='hidden md:block'>Pharmacists List</p>
+        </NavLink>
         </ul>
       )}
 
@@ -105,7 +115,7 @@ const Sidebar = () => {
 
           {/* Prescriptions Link */}
           <NavLink to={'/pharmacist-Appointment'} className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-blue-300' : ''}`}>
-            <img className='min-w-5' src={assets.prescriptions_icon} alt='' />
+            <img className='min-w-5' src={assets.appointment_icon} alt='' />
             <p className='hidden md:block'>Appointments</p>
           </NavLink>
 

@@ -107,7 +107,7 @@ const addPharmacist = async (req, res) => {
         const imageFile = req.file;
 
         // Ensure all required fields are provided
-        if (!name || !email || !password || !experience || !fees || !about || !speciality || !degree || !branch) {
+        if (!name || !email || !password || !experience || !fees || !about || !speciality || !degree || !branch || !imageFile) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
@@ -119,8 +119,18 @@ const addPharmacist = async (req, res) => {
         const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" });
         const imageUrl = imageUpload.secure_url;
 
-        // Create the pharmacist instance (CORRECTED LINE BELOW)
-        const newPharmacist = new pharmacistModel({  // ✅ Corrected lowercase `pharmacistModel`
+        // If branch is passed as a string, parse it; if it's already an object, use it directly
+        let parsedBranch = branch;
+        if (typeof branch === 'string') {
+            try {
+                parsedBranch = JSON.parse(branch);
+            } catch (error) {
+                return res.status(400).json({ success: false, message: 'Invalid branch data format. Ensure "branch" is a valid JSON object.' });
+            }
+        }
+
+        // Create the pharmacist instance
+        const newPharmacist = new pharmacistModel({
             name,
             email,
             password: hashedPassword,
@@ -130,8 +140,8 @@ const addPharmacist = async (req, res) => {
             about,
             speciality,
             degree,
-            branch,
-            date: Date.now(),
+            branch: parsedBranch,
+            date: new Date(),  // Use current Date object
         });
 
         // Save the pharmacist to the database
@@ -139,7 +149,7 @@ const addPharmacist = async (req, res) => {
         res.status(201).json({ success: true, message: 'Pharmacist added successfully' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+        res.status(500).json({ success: false, message: 'Failed to add pharmacist. Please try again later.' });
     }
 };
 

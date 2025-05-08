@@ -14,10 +14,10 @@ const pharmacistSchema = new mongoose.Schema(
     fees: { type: Number, required: true },
     slots_booked: { type: Object, default: {} },
     branch: {
-      name: { type: String}, // Required field for branch name
-      location: { type: String}, // Required field for branch location
+      name: { type: String, required: true }, // Make sure branch name is required
+      location: { type: String, required: true }, // Make sure branch location is required
     },
-    date: { type: Number, required: true }, // It seems like the 'date' field is related to a timestamp, like the pharmacist's registration date or availability, etc.
+    date: { type: Number, required: true }, // Pharmacist registration date
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt fields
 );

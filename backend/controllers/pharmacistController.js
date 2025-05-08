@@ -1,50 +1,12 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pharmacistModel from "../models/pharmacistModel.js";
+import appointmentModel from "../models/appointmentModel.js";
+
 
 
 // Add a new pharmacist
-export const addPharmacist = async (req, res) => {
-    try {
-        const { name, email, phone, address, password, available } = req.body;
 
-        // Check if pharmacist already exists
-        const existingPharmacist = await pharmacistModel.findOne({ email });
-        if (existingPharmacist) {
-            return res.status(400).json({
-                success: false,
-                message: "Pharmacist with this email already exists.",
-            });
-        }
-
-        // Hash the password before saving to database
-        const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
-
-        // Create a new pharmacist record
-        const newPharmacist = new pharmacistModel({
-            name,
-            email,
-            phone,
-            address,
-            password: hashedPassword, // Store the hashed password
-            available: available || false, // Default availability to false if not provided
-        });
-
-        await newPharmacist.save();
-
-        res.status(201).json({
-            success: true,
-            message: "Pharmacist added successfully!",
-            pharmacist: newPharmacist,
-        });
-    } catch (error) {
-        console.error("Error adding pharmacist:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error adding pharmacist. Please try again later.",
-        });
-    }
-};
 
 // List all pharmacists
 export const listPharmacists = async (req, res) => {
@@ -147,6 +109,20 @@ export const loginPharmacist = async (req, res) => {
     }
 };
 
+// API to get all appointments for pharmacist
+export const pharmAppointment = async (req, res) => {
+    try {
+
+        const { pharmacistId } = req.body
+        const appointments = await appointmentModel.find({ pharmacistId })
+
+        res.json({ success: true, appointments })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
 // Fetch pharmacist profile
 
 export const PharmacistProfile = async (req, res) => {

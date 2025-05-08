@@ -7,11 +7,13 @@ export const PharmacistContext = createContext();
 const PharmacistContextProvider = ({ children }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  // State for token, profile, and dashboard data
+  // State
   const [pToken, setPToken] = useState(localStorage.getItem("pToken") || "");
+  const [pharmappointments, setPharmAppointments] = useState([]);
   const [profileData, setProfileData] = useState(null);
 
-  // Error handler
+  const pharmacistId = localStorage.getItem("pharmacistId");
+
   const handleApiError = (error) => {
     const message =
       error.response?.data?.message ||
@@ -21,35 +23,62 @@ const PharmacistContextProvider = ({ children }) => {
     console.error("API Error:", message);
   };
 
+  // ✅ Fetch Appointments (POST instead of GET)
+  const getPharmAppointments = async () => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/pharmacists/pharm-appointment",
+        { pharmacistId },
+        { headers: { Authorization: `Bearer ${pToken}` } }
+      );
+
+      if (data.success) {
+        setPharmAppointments(data.appointments.reverse());
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      handleApiError(error);
+    }
+  };
+
   // ✅ Fetch Pharmacist Profile
   const getProfileData = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/pharmacists/profile", {
-        headers: { pToken },
-      });
+      const { data } = await axios.post(
+        backendUrl + "/api/pharmacists/profile",
+        { pharmacistId },
+        { headers: { Authorization: `Bearer ${pToken}` } }
+      );
       setProfileData(data.profileData);
     } catch (error) {
       handleApiError(error);
     }
   };
 
-  // Fetch profile on token change
+  // Fetch on token change
   useEffect(() => {
-    if (pToken) {
+    if (pToken && pharmacistId) {
       getProfileData();
+      getPharmAppointments();
     }
   }, [pToken]);
 
-  // Provide values to context
   const value = {
     pToken,
     setPToken,
     profileData,
     setProfileData,
     getProfileData,
+    pharmappointments,
+    getPharmAppointments,
   };
 
-  return <PharmacistContext.Provider value={value}>{children}</PharmacistContext.Provider>;
+  return (
+    <PharmacistContext.Provider value={value}>
+      {children}
+    </PharmacistContext.Provider>
+  );
 };
 
 export default PharmacistContextProvider;
