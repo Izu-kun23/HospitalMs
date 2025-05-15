@@ -1,25 +1,23 @@
 import express from 'express';
-import { listPharmacists, changePharmacistAvailability, loginPharmacist, pharmAppointment, PharmacistProfile } from '../controllers/pharmacistController.js';
-import authPharmacist from '../middlewares/authPharmacist.js';
+import { listPharmacists, changePharmacistAvailability, loginPharmacist, appointmentsPharmacist, PharmacistProfile } from '../controllers/pharmacistController.js';
+import  authPharmacist  from '../middlewares/authPharmacist.js';
 
 
-const pharmRouter = express.Router();
+const pharmacistRouter = express.Router();
 
 // Route to add a new pharmacist
 
 // Route to login a pharmacistnpm star
-pharmRouter.post('/login', loginPharmacist);
+pharmacistRouter.post('/login', loginPharmacist);
 
-pharmRouter.get("/profile", PharmacistProfile); // Protected route
+pharmacistRouter.get("/profile", PharmacistProfile); // Protected route
 
-pharmRouter.get('/pharm-appointment', authPharmacist, pharmAppointment);
-
-
-
+// Route to get appointments for a pharmacist
+pharmacistRouter.get('/appointments', authPharmacist, appointmentsPharmacist);
 // Route to list all pharmacists
-pharmRouter.get('/pharm-list', listPharmacists);
+pharmacistRouter.get('/pharm-list', listPharmacists);
 
-pharmRouter.put('/change-availability-pharmacist', changePharmacistAvailability)
+pharmacistRouter.put('/change-availability-pharmacist', changePharmacistAvailability)
 
 
-export default pharmRouter;
+export default pharmacistRouter;

@@ -108,36 +108,39 @@ export const loginPharmacist = async (req, res) => {
         });
     }
 };
+// In your controller (pharmacistController.js)
 
-// API to get all appointments for pharmacist
-export const pharmAppointment = async (req, res) => {
+const appointmentsPharmacist = async (req, res) => {
     try {
-
-        const { pharmacistId } = req.body
-        const appointments = await appointmentModel.find({ pharmacistId })
-
-        res.json({ success: true, appointments })
-
+        const pharmacistId = req.user.id; // ensure your authPharmacist middleware sets this
+        const appointments = await appointmentModel.find({ pharmacistId });
+        res.json({ success: true, appointments });
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+        console.error("Error fetching pharmacist appointments:", error);
+        res.status(500).json({ success: false, message: error.message });
     }
-}
-// Fetch pharmacist profile
+};
 
 export const PharmacistProfile = async (req, res) => {
     try {
+        // Use req.user._id which was added by your authentication middleware
+        const pharmacistId = req.user._id;
 
-        const { pharmacistId } = req.body
-        const profileData = await pharmacistModel.findById(pharmacistId).select('-password')
+        // Find the pharmacist profile based on the pharmacistId
+        const profileData = await pharmacistModel.findById(pharmacistId).select('-password'); // Exclude password field
 
-        res.json({ success: true, profileData })
+        // If no profile is found, return an error
+        if (!profileData) {
+            return res.status(404).json({ success: false, message: "Pharmacist not found." });
+        }
+
+        res.json({ success: true, profileData });
 
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+        console.log(error);
+        res.status(500).json({ success: false, message: "An error occurred while fetching profile data." });
     }
 }
   
 
-export { changePharmacistAvailability }; // Export the function for availability change
+export { changePharmacistAvailability, appointmentsPharmacist }; // Export the function for availability change

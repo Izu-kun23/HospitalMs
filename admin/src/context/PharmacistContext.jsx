@@ -7,71 +7,60 @@ export const PharmacistContext = createContext();
 const PharmacistContextProvider = ({ children }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  // State
-  const [pToken, setPToken] = useState(localStorage.getItem("pToken") || "");
-  const [pharmappointments, setPharmAppointments] = useState([]);
-  const [profileData, setProfileData] = useState(null);
+  const [pToken, setPToken] = useState(localStorage.getItem('pToken') || '');
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false); // Set loading to false initially
+  const [error, setError] = useState(null);
 
-  const pharmacistId = localStorage.getItem("pharmacistId");
+  // Fetch pharmacist appointments
+  const getPharmacistAppointments = async () => {
+    setLoading(true); // Set loading state
+    setError(null); // Reset errors before making a new request
 
-  const handleApiError = (error) => {
-    const message =
-      error.response?.data?.message ||
-      error.message ||
-      "An unknown error occurred";
-    toast.error(message);
-    console.error("API Error:", message);
-  };
+    if (!pToken) {
+      setError("No authentication token found. Please log in.");
+      toast.error("No authentication token found. Please log in.");
+      setLoading(false);
+      return;
+    }
 
-  // ✅ Fetch Appointments (POST instead of GET)
-  const getPharmAppointments = async () => {
     try {
-      const { data } = await axios.post(
-        backendUrl + "/api/pharmacists/pharm-appointment",
-        { pharmacistId },
-        { headers: { Authorization: `Bearer ${pToken}` } }
-      );
+      const response = await axios.get(`${backendUrl}/api/pharmacists/appointments`, {
+        headers: {
+          Authorization: `Bearer ${pToken}`,  // Send the JWT token in the header
+        },
+      });
+      console.log("Response from getPharmacistAppointments:", response.data);
 
-      if (data.success) {
-        setPharmAppointments(data.appointments.reverse());
+      if (response.data.success) {
+        setAppointments(response.data.appointments); // Store fetched appointments in state
       } else {
-        toast.error(data.message);
+        setError(response.data.message || "Failed to fetch appointments.");
+        toast.error(response.data.message || "Failed to fetch appointments.");
       }
     } catch (error) {
-      handleApiError(error);
+      setError(error.message);
+      toast.error(error.message || "Error occurred while fetching appointments.");
+    } finally {
+      setLoading(false); // Stop loading state once the request is finished
     }
   };
 
-  // ✅ Fetch Pharmacist Profile
-  const getProfileData = async () => {
-    try {
-      const { data } = await axios.post(
-        backendUrl + "/api/pharmacists/profile",
-        { pharmacistId },
-        { headers: { Authorization: `Bearer ${pToken}` } }
-      );
-      setProfileData(data.profileData);
-    } catch (error) {
-      handleApiError(error);
-    }
-  };
-
-  // Fetch on token change
+  // Automatically fetch appointments if the token is set and appointments are empty
   useEffect(() => {
-    if (pToken && pharmacistId) {
-      getProfileData();
-      getPharmAppointments();
+    if (pToken && appointments.length === 0) {
+      getPharmacistAppointments();  // Fetch appointments only if it's the first time or token changes
     }
   }, [pToken]);
 
+  // Value object for the context
   const value = {
     pToken,
-    setPToken,
-    profileData,
-    setProfileData,
-    getProfileData,
-    pharmappointments,
-    getPharmAppointments,
+    appointments,
+    getPharmacistAppointments,
+    loading,
+    error,
+    setPToken,  // Allow setting token externally
   };
 
   return (

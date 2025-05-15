@@ -30,7 +30,6 @@ doctorRouter.post('/accept-appointment', authDoctor, acceptAppointment);
 // Doctor list
 doctorRouter.get("/list", doctorList);
 
-
 // Change doctor's availability (better suited as a PUT request with doctorId in params)
 doctorRouter.put("/change-availability", authDoctor, changeAvailability);
 // Mark appointment as completed

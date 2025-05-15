@@ -18,7 +18,7 @@ const DoctorContextProvider = ({ children }) => {
       error.message ||
       "An unknown error occurred";
     toast.error(message);
-    console.error("API Error:", message);
+    console.error("API Error:", message);  
   };
 
   const getAppointments = async () => {

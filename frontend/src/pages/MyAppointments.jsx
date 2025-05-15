@@ -86,17 +86,7 @@ const MyAppointments = () => {
     }
   };
 
-  const getPharmacistAppointments = async () => {
-    try {
-      const { data } = await axios.get(`${backendUrl}/api/user/pharm-appointments`, {
-        headers: { token },
-      });
-      setAppointments(data.appointments.reverse()); // Store pharmacist appointments in the same state or a separate one
-    } catch (error) {
-      console.error(error);
-      toast.error(error.message);
-    }
-  };
+  
 
   const cancelAppointment = async (appointmentId) => {
     try {

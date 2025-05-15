@@ -59,7 +59,7 @@ const FilterDropdown = ({ options, selected, setSelected }) => {
           </div>
         </div>
       )}
-    </div>
+    </div>  
   );
 };
 

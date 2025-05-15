@@ -173,46 +173,58 @@ const bookPharmAppointment = async (req, res) => {
   try {
     const { userId, pharmacistId, slotDate, slotTime } = req.body;
 
+    // Fetch pharmacist and validate availability
     const pharmData = await pharmacistModel.findById(pharmacistId).select("-password");
     if (!pharmData || !pharmData.available) {
       return res.json({ success: false, message: "Pharmacist Not Available" });
     }
 
+    // Check slot availability
     let slots_booked = pharmData.slots_booked || {};
     if (slots_booked[slotDate]?.includes(slotTime)) {
       return res.json({ success: false, message: "Slot Not Available" });
     }
 
-    // Update booked slots
+    // Reserve slot
     slots_booked[slotDate] = [...(slots_booked[slotDate] || []), slotTime];
 
+    // Get user data
     const userData = await userModel.findById(userId).select("-password");
 
+    // Construct pharmacistData for appointment
+    const pharmacistData = {
+      _id: pharmData._id,
+      name: pharmData.name,
+      email: pharmData.email,
+      image: pharmData.image || "",
+      amount: pharmData.fees,
+      speciality: pharmData.speciality || "",
+      address: pharmData.address || {},
+      branch: {
+        name: pharmData.branch?.name || "Unavailable",
+        location: pharmData.branch?.location || "Unavailable"
+      }
+    };
+
+    // Create appointment
     const appointment = new appointmentModel({
       userId,
       pharmacistId,
-      userData: {
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone,
-      },
-      pharmacistData: {
-        name: pharmData.name,
-        image: pharmData.image,
-        branch: pharmData.branch,
-        speciality: pharmData.speciality,
-      },
+      userData,
+      pharmacistData,
       amount: pharmData.fees,
       slotTime,
       slotDate,
-      date: Date.now(),
+      date: Date.now()
     });
 
     await appointment.save();
     await pharmacistModel.findByIdAndUpdate(pharmacistId, { slots_booked });
 
     res.json({ success: true, message: "Pharmacist Appointment Booked" });
+
   } catch (error) {
+    console.error("Pharmacist booking error:", error);
     res.json({ success: false, message: error.message });
   }
 };

@@ -206,11 +206,6 @@ const updateDoctorProfile = async (req, res) => {
     }
 }
 
-
-    
-  
-
-
 // // API to get dashboard data for doctor panel
 const doctorDashboard = async (req, res) => {
     try {
