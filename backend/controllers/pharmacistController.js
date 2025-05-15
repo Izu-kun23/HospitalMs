@@ -121,26 +121,28 @@ const appointmentsPharmacist = async (req, res) => {
     }
 };
 
-export const PharmacistProfile = async (req, res) => {
+// Controller function
+const getPharmacistProfile = async (req, res) => {
     try {
-        // Use req.user._id which was added by your authentication middleware
-        const pharmacistId = req.user._id;
-
-        // Find the pharmacist profile based on the pharmacistId
-        const profileData = await pharmacistModel.findById(pharmacistId).select('-password'); // Exclude password field
-
-        // If no profile is found, return an error
-        if (!profileData) {
-            return res.status(404).json({ success: false, message: "Pharmacist not found." });
+        const pharmacist = await pharmacistModel.findById(req.user.id).select('-password');
+        if (!pharmacist) {
+            return res.status(404).json({ success: false, message: "Pharmacist not found" });
         }
+        res.json({ success: true, profileData: pharmacist });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
-        res.json({ success: true, profileData });
-
+const updatePharmacistProfile = async (req, res) => {
+    try {
+        const { pharmId, address, about, available } = req.body;
+        await pharmacistModel.findByIdAndUpdate(pharmId, { address, about, available });
+        res.json({ success: true, message: 'Profile Updated' });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: "An error occurred while fetching profile data." });
+        res.json({ success: false, message: error.message });
     }
-}
-  
+};
 
-export { changePharmacistAvailability, appointmentsPharmacist }; // Export the function for availability change
+export { changePharmacistAvailability, appointmentsPharmacist, getPharmacistProfile, updatePharmacistProfile }; // Export the function for availability change
